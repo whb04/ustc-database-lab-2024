@@ -1,0 +1,46 @@
+<!-- app/templates/projects.html -->
+{% extends "base.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+    <h2>Manage Projects</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.id.label }}<br>
+            {{ form.id(size=64) }}
+        </p>
+        <p>
+            {{ form.title.label }}<br>
+            {{ form.title(size=64) }}
+        </p>
+        <p>
+            {{ form.source.label }}<br>
+            {{ form.source(size=64) }}
+        </p>
+        <p>
+            {{ form.type.label }}<br>
+            {{ form.type() }}
+        </p>
+        <p>
+            {{ form.total_funding.label }}<br>
+            {{ form.total_funding() }}
+        </p>
+        <p>
+            {{ form.start_year.label }}<br>
+            {{ form.start_year() }}
+        </p>
+        <p>
+            {{ form.end_year.label }}<br>
+            {{ form.end_year() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <h3>Existing Projects</h3>
+    <ul>
+        {% for project in projects %}
+            <li>{{ project.id }} - {{ project.title }} - {{ project.source }} - {{ project.total_funding }} funding</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

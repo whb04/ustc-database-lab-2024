@@ -1,0 +1,34 @@
+<!-- app/templates/courses.html -->
+{% extends "base.html" %}
+
+{% block title %}Courses{% endblock %}
+
+{% block content %}
+    <h2>Manage Courses</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.id.label }}<br>
+            {{ form.id(size=64) }}
+        </p>
+        <p>
+            {{ form.title.label }}<br>
+            {{ form.title(size=64) }}
+        </p>
+        <p>
+            {{ form.hours.label }}<br>
+            {{ form.hours() }}
+        </p>
+        <p>
+            {{ form.nature.label }}<br>
+            {{ form.nature() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <h3>Existing Courses</h3>
+    <ul>
+        {% for course in courses %}
+            <li>{{ course.id }} - {{ course.title }} - {{ course.hours }} hours</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

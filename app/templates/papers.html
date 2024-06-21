@@ -12,23 +12,27 @@
             {{ form.title(size=64) }}
         </p>
         <p>
-            {{ form.authors.label }}<br>
-            {{ form.authors(size=64) }}
-        </p>
-        <p>
-            {{ form.journal.label }}<br>
-            {{ form.journal(size=64) }}
+            {{ form.source.label }}<br>
+            {{ form.source(size=64) }}
         </p>
         <p>
             {{ form.year.label }}<br>
-            {{ form.year(size=64) }}
+            {{ form.year() }}
+        </p>
+        <p>
+            {{ form.type.label }}<br>
+            {{ form.type() }}
+        </p>
+        <p>
+            {{ form.level.label }}<br>
+            {{ form.level() }}
         </p>
         <p>{{ form.submit() }}</p>
     </form>
     <h3>Existing Papers</h3>
     <ul>
         {% for paper in papers %}
-            <li>{{ paper.title }} by {{ paper.authors }} in {{ paper.journal }} ({{ paper.year }})</li>
+            <li>{{ paper.title }} - {{ paper.source }} - {{ paper.year.strftime('%Y') }}</li>
         {% endfor %}
     </ul>
 {% endblock %}
