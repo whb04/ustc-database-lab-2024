@@ -1,10 +1,10 @@
-<!-- app/templates/courses.html -->
+<!-- app/templates/edit_course.html -->
 {% extends "base.html" %}
 
-{% block title %}Courses{% endblock %}
+{% block title %}Edit Course{% endblock %}
 
 {% block content %}
-    <h2>Manage Courses</h2>
+    <h2>Edit Course</h2>
     <form method="POST">
         {{ form.hidden_tag() }}
         <p>
@@ -25,14 +25,4 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-    <h3>Existing Courses</h3>
-    <ul>
-        {% for course in courses %}
-            <li>
-                {{ course.id }} - {{ course.title }} - {{ course.hours }} hours
-                <a href="{{ url_for('edit_course', course_id=course.id) }}">Edit</a>
-                <a href="{{ url_for('delete_course', course_id=course.id) }}" onclick="return confirm('Are you sure?');">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
 {% endblock %}

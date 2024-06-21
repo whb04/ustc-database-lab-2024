@@ -1,10 +1,10 @@
-<!-- app/templates/papers.html -->
+<!-- app/templates/edit_paper.html -->
 {% extends "base.html" %}
 
-{% block title %}Papers{% endblock %}
+{% block title %}Edit Paper{% endblock %}
 
 {% block content %}
-    <h2>Manage Papers</h2>
+    <h2>Edit Paper</h2>
     <form method="POST">
         {{ form.hidden_tag() }}
         <p>
@@ -33,14 +33,4 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-    <h3>Existing Papers</h3>
-    <ul>
-        {% for paper in papers %}
-            <li>
-                {{ paper.title }} - {{ paper.source }} - {{ paper.year.strftime('%Y') }}
-                <a href="{{ url_for('edit_paper', paper_id=paper.id) }}">Edit</a>
-                <a href="{{ url_for('delete_paper', paper_id=paper.id) }}" onclick="return confirm('Are you sure?');">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
 {% endblock %}
