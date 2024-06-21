@@ -1,8 +1,8 @@
-"""Added teacher, paper, course, project and their relationships
+"""Initial migration.
 
-Revision ID: a7665fa6cf7d
+Revision ID: a78f4ee4028e
 Revises: 
-Create Date: 2024-06-21 21:19:30.423434
+Create Date: 2024-06-22 00:02:55.016598
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a7665fa6cf7d'
+revision = 'a78f4ee4028e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,15 +23,18 @@ def upgrade():
     sa.Column('title', sa.String(length=256), nullable=False),
     sa.Column('hours', sa.Integer(), nullable=False),
     sa.Column('nature', sa.Integer(), nullable=False),
+    sa.CheckConstraint('nature IN (1, 2)', name='check_course_nature'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('paper',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=256), nullable=False),
     sa.Column('source', sa.String(length=256), nullable=False),
-    sa.Column('year', sa.Date(), nullable=False),
+    sa.Column('year', sa.Integer(), nullable=False),
     sa.Column('type', sa.Integer(), nullable=False),
     sa.Column('level', sa.Integer(), nullable=False),
+    sa.CheckConstraint('level IN (1, 2, 3, 4, 5, 6)', name='check_paper_level'),
+    sa.CheckConstraint('type IN (1, 2, 3, 4)', name='check_paper_type'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('project',
@@ -42,6 +45,7 @@ def upgrade():
     sa.Column('total_funding', sa.Float(), nullable=False),
     sa.Column('start_year', sa.Integer(), nullable=False),
     sa.Column('end_year', sa.Integer(), nullable=False),
+    sa.CheckConstraint('type IN (1, 2, 3, 4, 5)', name='check_project_type'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('teacher',
@@ -49,6 +53,8 @@ def upgrade():
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('gender', sa.Integer(), nullable=False),
     sa.Column('title', sa.Integer(), nullable=False),
+    sa.CheckConstraint('gender IN (1, 2)', name='check_teacher_gender'),
+    sa.CheckConstraint('title IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)', name='check_teacher_title'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('teacher_course',
@@ -57,6 +63,7 @@ def upgrade():
     sa.Column('year', sa.Integer(), nullable=False),
     sa.Column('semester', sa.Integer(), nullable=False),
     sa.Column('hours_taken', sa.Integer(), nullable=False),
+    sa.CheckConstraint('semester IN (1, 2, 3)', name='check_course_semester'),
     sa.ForeignKeyConstraint(['course_id'], ['course.id'], ),
     sa.ForeignKeyConstraint(['teacher_id'], ['teacher.id'], ),
     sa.PrimaryKeyConstraint('teacher_id', 'course_id')
@@ -68,7 +75,8 @@ def upgrade():
     sa.Column('is_corresponding_author', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['paper_id'], ['paper.id'], ),
     sa.ForeignKeyConstraint(['teacher_id'], ['teacher.id'], ),
-    sa.PrimaryKeyConstraint('teacher_id', 'paper_id')
+    sa.PrimaryKeyConstraint('teacher_id', 'paper_id'),
+    sa.UniqueConstraint('paper_id', 'rank', name='unique_paper_rank')
     )
     op.create_table('teacher_project',
     sa.Column('teacher_id', sa.String(length=5), nullable=False),
@@ -77,7 +85,8 @@ def upgrade():
     sa.Column('funding_taken', sa.Float(), nullable=False),
     sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
     sa.ForeignKeyConstraint(['teacher_id'], ['teacher.id'], ),
-    sa.PrimaryKeyConstraint('teacher_id', 'project_id')
+    sa.PrimaryKeyConstraint('teacher_id', 'project_id'),
+    sa.UniqueConstraint('project_id', 'rank', name='unique_project_rank')
     )
     # ### end Alembic commands ###
 

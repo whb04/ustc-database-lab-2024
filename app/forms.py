@@ -17,7 +17,7 @@ class PaperForm(FlaskForm):
     id = StringField('ID', validators=[DataRequired()])
     title = StringField('Title', validators=[DataRequired()])
     source = StringField('Source', validators=[DataRequired()])
-    year = DateField('Year', format='%Y', validators=[DataRequired()])
+    year = StringField('Year', validators=[DataRequired()])
     type = SelectField('Type', choices=[
         (1, 'full paper'), (2, 'short paper'), (3, 'poster paper'), (4, 'demo paper')], 
         coerce=int, validators=[DataRequired()])

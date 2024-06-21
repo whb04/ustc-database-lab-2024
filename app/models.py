@@ -22,7 +22,7 @@ class Paper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
     source = db.Column(db.String(256), nullable=False)
-    year = db.Column(db.Date, nullable=False)
+    year = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Integer, nullable=False)
     level = db.Column(db.Integer, nullable=False)
 
