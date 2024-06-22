@@ -1,7 +1,7 @@
 # app/routes.py
 
-from flask import render_template, redirect, url_for, flash, request, make_response
-import csv
+from flask import render_template, redirect, url_for, flash, request, make_response, send_file
+from openpyxl import Workbook
 import io
 from app import app, db
 from app.models import Teacher, Paper, Course, Project, TeacherPaper, TeacherCourse, TeacherProject
@@ -412,40 +412,43 @@ def export_teacher_summary():
             Project.end_year >= start_year
         ).all()
 
-        # Generate CSV
-        output = io.StringIO()
-        writer = csv.writer(output)
+        # Create an Excel workbook and add a worksheet
+        wb = Workbook()
+        ws = wb.active
 
         # Write teacher info
-        writer.writerow(['教师基本信息'])
-        writer.writerow(['工号', '姓名', '性别', '职称'])
-        writer.writerow([teacher.id, teacher.name, GENDER_MAP.get(teacher.gender, '未知'), TITLE_MAP.get(teacher.title, '未知')])
+        ws.append(['教师基本信息'])
+        ws.append(['工号', '姓名', '性别', '职称'])
+        ws.append([teacher.id, teacher.name, GENDER_MAP.get(teacher.gender, '未知'), TITLE_MAP.get(teacher.title, '未知')])
 
         # Write teaching info
-        writer.writerow([])
-        writer.writerow(['教学情况'])
-        writer.writerow(['课程序号', '课程名称', '主讲学时', '学期'])
+        ws.append([])
+        ws.append(['教学情况'])
+        ws.append(['课程序号', '课程名称', '主讲学时', '学期'])
         for course in courses:
-            writer.writerow([course.course_id, course.course.title, course.hours_taken, SEMESTER_MAP.get(course.semester, '未知')])
+            ws.append([course.course_id, course.course.title, course.hours_taken, SEMESTER_MAP.get(course.semester, '未知')])
 
         # Write papers info
-        writer.writerow([])
-        writer.writerow(['发表论文情况'])
-        writer.writerow(['序号', '论文名称', '发表源', '发表年份', '类型', '级别', '排名', '是否通讯作者'])
+        ws.append([])
+        ws.append(['发表论文情况'])
+        ws.append(['序号', '论文名称', '发表源', '发表年份', '类型', '级别', '排名', '是否通讯作者'])
         for paper in papers:
-            writer.writerow([paper.paper_id, paper.paper.title, paper.paper.source, paper.paper.year, PAPER_TYPE_MAP.get(paper.paper.type, '未知'), PAPER_LEVEL_MAP.get(paper.paper.level, '未知'), paper.rank, '是' if paper.is_corresponding_author else '否'])
+            ws.append([paper.paper_id, paper.paper.title, paper.paper.source, paper.paper.year, PAPER_TYPE_MAP.get(paper.paper.type, '未知'), PAPER_LEVEL_MAP.get(paper.paper.level, '未知'), paper.rank, '是' if paper.is_corresponding_author else '否'])
 
         # Write projects info
-        writer.writerow([])
-        writer.writerow(['承担项目情况'])
-        writer.writerow(['项目号', '项目名称', '项目来源', '项目类型', '总经费', '开始年份', '结束年份', '排名', '承担经费'])
+        ws.append([])
+        ws.append(['承担项目情况'])
+        ws.append(['项目号', '项目名称', '项目来源', '项目类型', '总经费', '开始年份', '结束年份', '排名', '承担经费'])
         for project in projects:
-            writer.writerow([project.project_id, project.project.title, project.project.source, PROJECT_TYPE_MAP.get(project.project.type, '未知'), project.project.total_funding, project.project.start_year, project.project.end_year, project.rank, project.funding_taken])
+            ws.append([project.project_id, project.project.title, project.project.source, PROJECT_TYPE_MAP.get(project.project.type, '未知'), project.project.total_funding, project.project.start_year, project.project.end_year, project.rank, project.funding_taken])
+
+        # Save the workbook to a stream
+        excel_file = io.BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
 
         # Create response
-        response = make_response(output.getvalue())
-        response.headers['Content-Disposition'] = f'attachment; filename={teacher_id}_summary_{start_year}-{end_year}.csv'
-        response.headers['Content-type'] = 'text/csv'
+        response = send_file(excel_file, as_attachment=True, download_name=f'{teacher_id}_summary_{start_year}-{end_year}.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         return response
 
     return render_template('teacher_summary.html', form=form)
