@@ -9,7 +9,7 @@
         {{ form.hidden_tag() }}
         <p>
             {{ form.id.label }}<br>
-            {{ form.id(size=64) }}
+            {{ form.id() }}
         </p>
         <p>
             {{ form.title.label }}<br>
@@ -37,4 +37,49 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    
+    <h3>Teachers</h3>
+    <form method="POST" action="{{ url_for('add_project_teacher', project_id=project.id) }}">
+        {{ teacher_form.hidden_tag() }}
+        <p>
+            {{ teacher_form.teacher_id.label }}<br>
+            {{ teacher_form.teacher_id() }}
+        </p>
+        <p>
+            {{ teacher_form.rank.label }}<br>
+            {{ teacher_form.rank() }}
+        </p>
+        <p>
+            {{ teacher_form.funding_taken.label }}<br>
+            {{ teacher_form.funding_taken() }}
+        </p>
+        <p>{{ teacher_form.submit() }}</p>
+    </form>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Teacher ID</th>
+                <th>Name</th>
+                <th>Rank</th>
+                <th>Funding</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in project.teachers %}
+            <tr>
+                <td>{{ teacher.teacher_id }}</td>
+                <td>{{ teacher.teacher.name }}</td>
+                <td>{{ teacher.rank }}</td>
+                <td>{{ teacher.funding_taken }}</td>
+                <td>
+                    <form action="{{ url_for('delete_project_teacher', project_id=project.id, teacher_id=teacher.teacher_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

@@ -5,11 +5,11 @@
 
 {% block content %}
     <h2>Edit Course</h2>
-    <form method="POST">
+    <form method="POST" action="{{ url_for('edit_course', course_id=course.id) }}">
         {{ form.hidden_tag() }}
         <p>
             {{ form.id.label }}<br>
-            {{ form.id(size=64) }}
+            {{ form.id() }}
         </p>
         <p>
             {{ form.title.label }}<br>
@@ -25,4 +25,55 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    
+    <h3>Teachers</h3>
+    <form method="POST" action="{{ url_for('add_course_teacher', course_id=course.id) }}">
+        {{ teacher_form.hidden_tag() }}
+        <p>
+            {{ teacher_form.teacher_id.label }}<br>
+            {{ teacher_form.teacher_id() }}
+        </p>
+        <p>
+            {{ teacher_form.year.label }}<br>
+            {{ teacher_form.year() }}
+        </p>
+        <p>
+            {{ teacher_form.semester.label }}<br>
+            {{ teacher_form.semester() }}
+        </p>
+        <p>
+            {{ teacher_form.hours_taken.label }}<br>
+            {{ teacher_form.hours_taken() }}
+        </p>
+        <p>{{ teacher_form.submit() }}</p>
+    </form>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Teacher ID</th>
+                <th>Name</th>
+                <th>Year</th>
+                <th>Semester</th>
+                <th>Hours</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in course.teachers %}
+            <tr>
+                <td>{{ teacher.teacher_id }}</td>
+                <td>{{ teacher.teacher.name }}</td>
+                <td>{{ teacher.year }}</td>
+                <td>{{ teacher.semester }}</td>
+                <td>{{ teacher.hours_taken }}</td>
+                <td>
+                    <form action="{{ url_for('delete_course_teacher', course_id=course.id, teacher_id=teacher.teacher_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

@@ -33,4 +33,49 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    
+    <h3>Authors</h3>
+    <form method="POST" action="{{ url_for('add_paper_author', paper_id=paper.id) }}">
+        {{ author_form.hidden_tag() }}
+        <p>
+            {{ author_form.teacher_id.label }}<br>
+            {{ author_form.teacher_id() }}
+        </p>
+        <p>
+            {{ author_form.rank.label }}<br>
+            {{ author_form.rank() }}
+        </p>
+        <p>
+            {{ author_form.is_corresponding_author.label }}<br>
+            {{ author_form.is_corresponding_author() }}
+        </p>
+        <p>{{ author_form.submit() }}</p>
+    </form>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Teacher ID</th>
+                <th>Name</th>
+                <th>Rank</th>
+                <th>Corresponding</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for author in paper.authors %}
+            <tr>
+                <td>{{ author.teacher_id }}</td>
+                <td>{{ author.teacher.name }}</td>
+                <td>{{ author.rank }}</td>
+                <td>{{ 'Yes' if author.is_corresponding_author else 'No' }}</td>
+                <td>
+                    <form action="{{ url_for('delete_paper_author', paper_id=paper.id, teacher_id=author.teacher_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

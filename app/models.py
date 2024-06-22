@@ -69,8 +69,8 @@ class Course(db.Model):
 class TeacherCourse(db.Model):
     teacher_id = db.Column(db.String(5), db.ForeignKey('teacher.id'), primary_key=True)
     course_id = db.Column(db.String(256), db.ForeignKey('course.id'), primary_key=True)
-    year = db.Column(db.Integer, nullable=False)
-    semester = db.Column(db.Integer, nullable=False)
+    year = db.Column(db.Integer, primary_key=True)
+    semester = db.Column(db.Integer, primary_key=True)
     hours_taken = db.Column(db.Integer, nullable=False)
 
     teacher = db.relationship('Teacher', back_populates='courses')
@@ -83,7 +83,9 @@ class TeacherCourse(db.Model):
     @validates('hours_taken')
     def validate_hours_taken(self, key, value):
         if value:
-            total_hours = db.session.query(db.func.sum(TeacherCourse.hours_taken)).filter_by(course_id=self.course_id).scalar()
+            total_hours = db.session.query(db.func.sum(TeacherCourse.hours_taken)).filter_by(course_id=self.course_id, year=self.year, semester=self.semester).scalar()
+            if total_hours is None:
+                total_hours = 0
             course_hours = Course.query.filter_by(id=self.course_id).first().hours
             if total_hours + value > course_hours:
                 raise ValueError('Total teaching hours cannot exceed course hours')
@@ -121,6 +123,8 @@ class TeacherProject(db.Model):
     def validate_funding_taken(self, key, value):
         if value:
             total_funding = db.session.query(db.func.sum(TeacherProject.funding_taken)).filter_by(project_id=self.project_id).scalar()
+            if total_funding is None:
+                total_funding = 0
             project_funding = Project.query.filter_by(id=self.project_id).first().total_funding
             if total_funding + value > project_funding:
                 raise ValueError('Total funding taken cannot exceed project total funding')
