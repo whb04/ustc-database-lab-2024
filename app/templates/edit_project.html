@@ -1,85 +1,90 @@
-<!-- app/templates/edit_project.html -->
 {% extends "base.html" %}
 
 {% block title %}Edit Project{% endblock %}
 
 {% block content %}
-    <h2>Edit Project</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.id.label }}<br>
-            {{ form.id() }}
-        </p>
-        <p>
-            {{ form.title.label }}<br>
-            {{ form.title(size=64) }}
-        </p>
-        <p>
-            {{ form.source.label }}<br>
-            {{ form.source(size=64) }}
-        </p>
-        <p>
-            {{ form.type.label }}<br>
-            {{ form.type() }}
-        </p>
-        <p>
-            {{ form.total_funding.label }}<br>
-            {{ form.total_funding() }}
-        </p>
-        <p>
-            {{ form.start_year.label }}<br>
-            {{ form.start_year() }}
-        </p>
-        <p>
-            {{ form.end_year.label }}<br>
-            {{ form.end_year() }}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-    
-    <h3>Teachers</h3>
-    <form method="POST" action="{{ url_for('add_project_teacher', project_id=project.id) }}">
-        {{ teacher_form.hidden_tag() }}
-        <p>
-            {{ teacher_form.teacher_id.label }}<br>
-            {{ teacher_form.teacher_id() }}
-        </p>
-        <p>
-            {{ teacher_form.rank.label }}<br>
-            {{ teacher_form.rank() }}
-        </p>
-        <p>
-            {{ teacher_form.funding_taken.label }}<br>
-            {{ teacher_form.funding_taken() }}
-        </p>
-        <p>{{ teacher_form.submit() }}</p>
-    </form>
+    <div class="container mt-4">
+        <h2 class="mb-4">Edit Project</h2>
+        <form method="POST" class="needs-validation" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.id.label(class="form-control-label") }}
+                {{ form.id(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {{ form.title(class="form-control", size=64) }}
+            </div>
+            <div class="form-group">
+                {{ form.source.label(class="form-control-label") }}
+                {{ form.source(class="form-control", size=64) }}
+            </div>
+            <div class="form-group">
+                {{ form.type.label(class="form-control-label") }}
+                {{ form.type(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.total_funding.label(class="form-control-label") }}
+                {{ form.total_funding(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.start_year.label(class="form-control-label") }}
+                {{ form.start_year(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.end_year.label(class="form-control-label") }}
+                {{ form.end_year(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+        
+        <h3 class="mb-3">Teachers</h3>
+        <form method="POST" action="{{ url_for('add_project_teacher', project_id=project.id) }}" class="mb-4">
+            {{ teacher_form.hidden_tag() }}
+            <div class="form-group">
+                {{ teacher_form.teacher_id.label(class="form-control-label") }}
+                {{ teacher_form.teacher_id(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ teacher_form.rank.label(class="form-control-label") }}
+                {{ teacher_form.rank(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ teacher_form.funding_taken.label(class="form-control-label") }}
+                {{ teacher_form.funding_taken(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ teacher_form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
 
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Teacher ID</th>
-                <th>Name</th>
-                <th>Rank</th>
-                <th>Funding</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for teacher in project.teachers %}
-            <tr>
-                <td>{{ teacher.teacher_id }}</td>
-                <td>{{ teacher.teacher.name }}</td>
-                <td>{{ teacher.rank }}</td>
-                <td>{{ teacher.funding_taken }}</td>
-                <td>
-                    <form action="{{ url_for('delete_project_teacher', project_id=project.id, teacher_id=teacher.teacher_id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Teacher ID</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Funding</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in project.teachers %}
+                <tr>
+                    <td>{{ teacher.teacher_id }}</td>
+                    <td>{{ teacher.teacher.name }}</td>
+                    <td>{{ teacher.rank }}</td>
+                    <td>{{ teacher.funding_taken }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_project_teacher', project_id=project.id, teacher_id=teacher.teacher_id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

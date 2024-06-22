@@ -1,81 +1,86 @@
-<!-- app/templates/edit_paper.html -->
 {% extends "base.html" %}
 
 {% block title %}Edit Paper{% endblock %}
 
 {% block content %}
-    <h2>Edit Paper</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.id.label }}<br>
-            {{ form.id() }}
-        </p>
-        <p>
-            {{ form.title.label }}<br>
-            {{ form.title(size=64) }}
-        </p>
-        <p>
-            {{ form.source.label }}<br>
-            {{ form.source(size=64) }}
-        </p>
-        <p>
-            {{ form.year.label }}<br>
-            {{ form.year() }}
-        </p>
-        <p>
-            {{ form.type.label }}<br>
-            {{ form.type() }}
-        </p>
-        <p>
-            {{ form.level.label }}<br>
-            {{ form.level() }}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-    
-    <h3>Authors</h3>
-    <form method="POST" action="{{ url_for('add_paper_author', paper_id=paper.id) }}">
-        {{ author_form.hidden_tag() }}
-        <p>
-            {{ author_form.teacher_id.label }}<br>
-            {{ author_form.teacher_id() }}
-        </p>
-        <p>
-            {{ author_form.rank.label }}<br>
-            {{ author_form.rank() }}
-        </p>
-        <p>
-            {{ author_form.is_corresponding_author.label }}<br>
-            {{ author_form.is_corresponding_author() }}
-        </p>
-        <p>{{ author_form.submit() }}</p>
-    </form>
+    <div class="container mt-4">
+        <h2 class="mb-4">Edit Paper</h2>
+        <form method="POST" class="needs-validation" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.id.label(class="form-control-label") }}
+                {{ form.id(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {{ form.title(class="form-control", size=64) }}
+            </div>
+            <div class="form-group">
+                {{ form.source.label(class="form-control-label") }}
+                {{ form.source(class="form-control", size=64) }}
+            </div>
+            <div class="form-group">
+                {{ form.year.label(class="form-control-label") }}
+                {{ form.year(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.type.label(class="form-control-label") }}
+                {{ form.type(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.level.label(class="form-control-label") }}
+                {{ form.level(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+        
+        <h3 class="mb-3">Authors</h3>
+        <form method="POST" action="{{ url_for('add_paper_author', paper_id=paper.id) }}" class="mb-4">
+            {{ author_form.hidden_tag() }}
+            <div class="form-group">
+                {{ author_form.teacher_id.label(class="form-control-label") }}
+                {{ author_form.teacher_id(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ author_form.rank.label(class="form-control-label") }}
+                {{ author_form.rank(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ author_form.is_corresponding_author.label(class="form-control-label") }}
+                {{ author_form.is_corresponding_author(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ author_form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
 
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Teacher ID</th>
-                <th>Name</th>
-                <th>Rank</th>
-                <th>Corresponding</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for author in paper.authors %}
-            <tr>
-                <td>{{ author.teacher_id }}</td>
-                <td>{{ author.teacher.name }}</td>
-                <td>{{ author.rank }}</td>
-                <td>{{ 'Yes' if author.is_corresponding_author else 'No' }}</td>
-                <td>
-                    <form action="{{ url_for('delete_paper_author', paper_id=paper.id, teacher_id=author.teacher_id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Teacher ID</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Corresponding</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for author in paper.authors %}
+                <tr>
+                    <td>{{ author.teacher_id }}</td>
+                    <td>{{ author.teacher.name }}</td>
+                    <td>{{ author.rank }}</td>
+                    <td>{{ 'Yes' if author.is_corresponding_author else 'No' }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_paper_author', paper_id=paper.id, teacher_id=author.teacher_id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
