@@ -1,6 +1,8 @@
 # app/routes.py
 
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, make_response
+import csv
+import io
 from app import app, db
 from app.models import Teacher, Paper, Course, Project, TeacherPaper, TeacherCourse, TeacherProject
 from app.forms import TeacherForm, PaperForm, CourseForm, ProjectForm, PaperAuthorForm, CourseTeacherForm, ProjectTeacherForm, TeacherQueryForm
@@ -381,3 +383,70 @@ def teacher_summary():
             flash(f'Teacher with ID {teacher_id} not found.', 'danger')
 
     return render_template('teacher_summary.html', form=form, teacher=teacher, courses=courses, papers=papers, projects=projects)
+
+@app.route('/export_teacher_summary', methods=['GET', 'POST'])
+def export_teacher_summary():
+    form = TeacherQueryForm()
+    if form.validate_on_submit():
+        teacher_id = form.teacher_id.data
+        start_year = form.start_year.data
+        end_year = form.end_year.data
+
+        teacher = Teacher.query.get(teacher_id)
+        if not teacher:
+            flash(f'Teacher with ID {teacher_id} not found.', 'danger')
+            return redirect(url_for('teacher_summary'))
+
+        courses = TeacherCourse.query.filter(
+            TeacherCourse.teacher_id == teacher_id,
+            TeacherCourse.year.between(start_year, end_year)
+        ).all()
+        papers = TeacherPaper.query.join(Paper).filter(
+            TeacherPaper.teacher_id == teacher_id,
+            Paper.year.between(start_year, end_year)
+        ).all()
+        projects = TeacherProject.query.join(Project).filter(
+            TeacherProject.teacher_id == teacher_id,
+            Project.start_year <= end_year,
+            Project.end_year >= start_year
+        ).all()
+
+        # Generate CSV
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # Write teacher info
+        writer.writerow(['教师基本信息'])
+        writer.writerow(['工号', '姓名', '性别', '职称'])
+        writer.writerow([teacher.id, teacher.name, '男' if teacher.gender == 1 else '女', teacher.title])
+
+        # Write teaching info
+        writer.writerow([])
+        writer.writerow(['教学情况'])
+        writer.writerow(['课程序号', '课程名称', '主讲学时', '学期'])
+        for course in courses:
+            writer.writerow([course.course_id, course.course.title, course.hours_taken, course.semester])
+
+        # Write papers info
+        writer.writerow([])
+        writer.writerow(['发表论文情况'])
+        writer.writerow(['序号', '论文名称', '发表源', '发表年份', '类型', '级别', '排名', '是否通讯作者'])
+        for paper in papers:
+            writer.writerow([paper.paper_id, paper.paper.title, paper.paper.source, paper.paper.year, paper.paper.type, paper.paper.level, paper.rank, '是' if paper.is_corresponding_author else '否'])
+
+        # Write projects info
+        writer.writerow([])
+        writer.writerow(['承担项目情况'])
+        writer.writerow(['项目号', '项目名称', '项目来源', '项目类型', '总经费', '开始年份', '结束年份', '排名', '承担经费'])
+        for project in projects:
+            writer.writerow([project.project_id, project.project.title, project.project.source, project.project.type, project.project.total_funding, project.project.start_year, project.project.end_year, project.rank, project.funding_taken])
+
+        # Create response
+        response = make_response(output.getvalue())
+        response.headers['Content-Disposition'] = f'attachment; filename={teacher_id}_summary_{start_year}-{end_year}.csv'
+        response.headers['Content-type'] = 'text/csv'
+        return response
+    else:
+        print(form.errors)
+
+    return render_template('teacher_summary.html', form=form)

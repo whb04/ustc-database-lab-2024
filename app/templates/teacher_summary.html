@@ -5,7 +5,7 @@
 
 {% block content %}
     <h2>Teacher Summary</h2>
-    <form method="POST">
+    <form method="POST" action="{{ url_for('teacher_summary') }}">
         {{ form.hidden_tag() }}
         <p>
             {{ form.teacher_id.label }}<br>
@@ -123,4 +123,12 @@
             <p>No projects found.</p>
         {% endif %}
     {% endif %}
+
+    <form method="POST" action="{{ url_for('export_teacher_summary') }}">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="teacher_id" value="{{ form.teacher_id.data }}">
+        <input type="hidden" name="start_year" value="{{ form.start_year.data }}">
+        <input type="hidden" name="end_year" value="{{ form.end_year.data }}">
+        <p><button type="submit" class="btn btn-primary">Export to CSV</button></p>
+    </form>
 {% endblock %}
