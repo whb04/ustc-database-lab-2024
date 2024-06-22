@@ -43,7 +43,9 @@
             <li>
                 {{ project.id }} - {{ project.title }} - {{ project.source }} - {{ project.total_funding }} funding
                 <a href="{{ url_for('edit_project', project_id=project.id) }}">Edit</a>
-                <a href="{{ url_for('delete_project', project_id=project.id) }}" onclick="return confirm('Are you sure?');">Delete</a>
+                <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Are you sure?');">Delete</button>
+                </form>
             </li>
         {% endfor %}
     </ul>

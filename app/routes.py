@@ -12,15 +12,59 @@ def index():
 # Teacher routes
 @app.route('/teachers', methods=['GET', 'POST'])
 def teachers():
+    teachers = Teacher.query.all()
+    return render_template('teachers.html', teachers=teachers)
+
+@app.route('/add_teacher', methods=['GET', 'POST'])
+def add_teacher():
     form = TeacherForm()
     if form.validate_on_submit():
-        teacher = Teacher(id=form.id.data, name=form.name.data, gender=form.gender.data, title=form.title.data)
-        db.session.add(teacher)
-        db.session.commit()
-        flash('Teacher added successfully!')
+        teacher = Teacher(
+            id=form.id.data,
+            name=form.name.data,
+            gender=form.gender.data,
+            title=form.title.data
+        )
+        try:
+            db.session.add(teacher)
+            db.session.commit()
+            flash('Teacher added successfully!')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error adding teacher: {e}', 'danger')
         return redirect(url_for('teachers'))
-    teachers = Teacher.query.all()
-    return render_template('teachers.html', form=form, teachers=teachers)
+    return render_template('add_teacher.html', form=form)
+
+@app.route('/edit_teacher/<string:teacher_id>', methods=['GET', 'POST'])
+def edit_teacher(teacher_id):
+    teacher = Teacher.query.get_or_404(teacher_id)
+    form = TeacherForm(obj=teacher)
+    if form.validate_on_submit():
+        try:
+            # Update the teacher with new form data
+            teacher.id = form.id.data
+            teacher.name = form.name.data
+            teacher.gender = form.gender.data
+            teacher.title = form.title.data
+            db.session.commit()
+            flash('Teacher updated successfully!')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating teacher: {e}', 'danger')
+        return redirect(url_for('teachers'))
+    return render_template('edit_teacher.html', form=form)
+
+@app.route('/delete_teacher/<string:teacher_id>', methods=['POST'])
+def delete_teacher(teacher_id):
+    teacher = Teacher.query.get_or_404(teacher_id)
+    try:
+        db.session.delete(teacher)
+        db.session.commit()
+        flash('Teacher deleted successfully!')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting teacher: {e}', 'danger')
+    return redirect(url_for('teachers'))
 
 # Paper routes
 @app.route('/papers', methods=['GET', 'POST'])
@@ -93,13 +137,15 @@ def projects():
     projects = Project.query.all()
     return render_template('projects.html', form=form, projects=projects)
 
-# Edit and delete routes
+# Edit Paper
 @app.route('/edit_paper/<int:paper_id>', methods=['GET', 'POST'])
 def edit_paper(paper_id):
     paper = Paper.query.get_or_404(paper_id)
     form = PaperForm(obj=paper)
     if form.validate_on_submit():
         try:
+            # Update the paper with new form data
+            paper.id = form.id.data
             paper.title = form.title.data
             paper.source = form.source.data
             paper.year = form.year.data
@@ -113,6 +159,8 @@ def edit_paper(paper_id):
         return redirect(url_for('papers'))
     return render_template('edit_paper.html', form=form)
 
+
+# Delete Paper
 @app.route('/delete_paper/<int:paper_id>', methods=['POST'])
 def delete_paper(paper_id):
     try:
@@ -125,12 +173,15 @@ def delete_paper(paper_id):
         flash(f'Error deleting paper: {e}', 'danger')
     return redirect(url_for('papers'))
 
+# Edit Course
 @app.route('/edit_course/<string:course_id>', methods=['GET', 'POST'])
 def edit_course(course_id):
     course = Course.query.get_or_404(course_id)
     form = CourseForm(obj=course)
     if form.validate_on_submit():
         try:
+            # Update the course with new form data
+            course.id = form.id.data
             course.title = form.title.data
             course.hours = form.hours.data
             course.nature = form.nature.data
@@ -142,6 +193,7 @@ def edit_course(course_id):
         return redirect(url_for('courses'))
     return render_template('edit_course.html', form=form)
 
+# Delete Course
 @app.route('/delete_course/<string:course_id>', methods=['POST'])
 def delete_course(course_id):
     try:
@@ -154,12 +206,15 @@ def delete_course(course_id):
         flash(f'Error deleting course: {e}', 'danger')
     return redirect(url_for('courses'))
 
+# Edit Project
 @app.route('/edit_project/<string:project_id>', methods=['GET', 'POST'])
 def edit_project(project_id):
     project = Project.query.get_or_404(project_id)
     form = ProjectForm(obj=project)
     if form.validate_on_submit():
         try:
+            # Update the project with new form data
+            project.id = form.id.data
             project.title = form.title.data
             project.source = form.source.data
             project.type = form.type.data
@@ -174,6 +229,8 @@ def edit_project(project_id):
         return redirect(url_for('projects'))
     return render_template('edit_project.html', form=form)
 
+
+# Delete Project
 @app.route('/delete_project/<string:project_id>', methods=['POST'])
 def delete_project(project_id):
     try:

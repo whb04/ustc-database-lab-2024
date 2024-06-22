@@ -1,0 +1,28 @@
+<!-- app/templates/edit_teacher.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit Teacher{% endblock %}
+
+{% block content %}
+    <h2>Edit Teacher</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.id.label }}<br>
+            {{ form.id() }}
+        </p>
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name() }}
+        </p>
+        <p>
+            {{ form.gender.label }}<br>
+            {{ form.gender() }}
+        </p>
+        <p>
+            {{ form.title.label }}<br>
+            {{ form.title() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
