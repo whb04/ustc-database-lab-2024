@@ -6,6 +6,7 @@ import io
 from app import app, db
 from app.models import Teacher, Paper, Course, Project, TeacherPaper, TeacherCourse, TeacherProject
 from app.forms import TeacherForm, PaperForm, CourseForm, ProjectForm, PaperAuthorForm, CourseTeacherForm, ProjectTeacherForm, TeacherQueryForm
+from config import GENDER_MAP, TITLE_MAP, PAPER_TYPE_MAP, PAPER_LEVEL_MAP, PROJECT_TYPE_MAP, SEMESTER_MAP
 
 @app.route('/')
 def index():
@@ -418,35 +419,33 @@ def export_teacher_summary():
         # Write teacher info
         writer.writerow(['教师基本信息'])
         writer.writerow(['工号', '姓名', '性别', '职称'])
-        writer.writerow([teacher.id, teacher.name, '男' if teacher.gender == 1 else '女', teacher.title])
+        writer.writerow([teacher.id, teacher.name, GENDER_MAP.get(teacher.gender, '未知'), TITLE_MAP.get(teacher.title, '未知')])
 
         # Write teaching info
         writer.writerow([])
         writer.writerow(['教学情况'])
         writer.writerow(['课程序号', '课程名称', '主讲学时', '学期'])
         for course in courses:
-            writer.writerow([course.course_id, course.course.title, course.hours_taken, course.semester])
+            writer.writerow([course.course_id, course.course.title, course.hours_taken, SEMESTER_MAP.get(course.semester, '未知')])
 
         # Write papers info
         writer.writerow([])
         writer.writerow(['发表论文情况'])
         writer.writerow(['序号', '论文名称', '发表源', '发表年份', '类型', '级别', '排名', '是否通讯作者'])
         for paper in papers:
-            writer.writerow([paper.paper_id, paper.paper.title, paper.paper.source, paper.paper.year, paper.paper.type, paper.paper.level, paper.rank, '是' if paper.is_corresponding_author else '否'])
+            writer.writerow([paper.paper_id, paper.paper.title, paper.paper.source, paper.paper.year, PAPER_TYPE_MAP.get(paper.paper.type, '未知'), PAPER_LEVEL_MAP.get(paper.paper.level, '未知'), paper.rank, '是' if paper.is_corresponding_author else '否'])
 
         # Write projects info
         writer.writerow([])
         writer.writerow(['承担项目情况'])
         writer.writerow(['项目号', '项目名称', '项目来源', '项目类型', '总经费', '开始年份', '结束年份', '排名', '承担经费'])
         for project in projects:
-            writer.writerow([project.project_id, project.project.title, project.project.source, project.project.type, project.project.total_funding, project.project.start_year, project.project.end_year, project.rank, project.funding_taken])
+            writer.writerow([project.project_id, project.project.title, project.project.source, PROJECT_TYPE_MAP.get(project.project.type, '未知'), project.project.total_funding, project.project.start_year, project.project.end_year, project.rank, project.funding_taken])
 
         # Create response
         response = make_response(output.getvalue())
         response.headers['Content-Disposition'] = f'attachment; filename={teacher_id}_summary_{start_year}-{end_year}.csv'
         response.headers['Content-type'] = 'text/csv'
         return response
-    else:
-        print(form.errors)
 
     return render_template('teacher_summary.html', form=form)
