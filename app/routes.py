@@ -220,6 +220,10 @@ def edit_course(course_id):
     teacher_form = CourseTeacherForm()
     if form.validate_on_submit():
         try:
+            total_hours_taken = db.session.query(db.func.sum(TeacherCourse.hours_taken)).filter_by(course_id=course.id).scalar() or 0
+            if form.hours.data < total_hours_taken:
+                raise ValueError('Course total hours cannot be less than the total hours taken by teachers')
+
             course.id = form.id.data
             course.title = form.title.data
             course.hours = form.hours.data
@@ -289,6 +293,10 @@ def edit_project(project_id):
     teacher_form = ProjectTeacherForm()
     if form.validate_on_submit():
         try:
+            total_funding_taken = db.session.query(db.func.sum(TeacherProject.funding_taken)).filter_by(project_id=project.id).scalar() or 0
+            if form.total_funding.data < total_funding_taken:
+                raise ValueError('Project total funding cannot be less than the total funding taken by teachers')
+
             project.id = form.id.data
             project.title = form.title.data
             project.source = form.source.data
